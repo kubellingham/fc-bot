@@ -1,0 +1,166 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * FC Market Intelligence design tokens.
+ * Dark is the primary experience (deep charcoal-navy terminal); light is a
+ * selected theme with its own steps, not an automatic inversion.
+ *
+ * Chart colors were validated with the dataviz palette validator against the
+ * card surface in each mode (lightness band, chroma, CVD and contrast):
+ *   value  #2a78d6 / #3987e5   gain  #0a8f86 / #1d9c92   loss  #d9480f / #e0602f
+ * Gain/loss TEXT uses darker/lighter steps that meet WCAG AA (≥ 4.5:1).
+ * Polarity is never shown by color alone: values carry a sign and an icon.
+ */
+:root {
+  --radius: 0.5rem;
+
+  --background: #f6f7f9;
+  --foreground: #0e1621;
+  --card: #ffffff;
+  --card-foreground: #0e1621;
+  --popover: #ffffff;
+  --popover-foreground: #0e1621;
+  --primary: #087a72;
+  --primary-foreground: #ffffff;
+  --secondary: #eef1f4;
+  --secondary-foreground: #0e1621;
+  --muted: #eef1f4;
+  --muted-foreground: #5b6673;
+  --accent: #e9eef2;
+  --accent-foreground: #0e1621;
+  --destructive: #c2410c;
+  --destructive-foreground: #ffffff;
+  --border: #e1e6eb;
+  --input: #d5dbe2;
+  --ring: #087a72;
+
+  --gain: #087a72;
+  --loss: #c2410c;
+  --warning: #a16207;
+  --info: #1d5fb8;
+
+  --chart-value: #2a78d6;
+  --chart-gain: #0a8f86;
+  --chart-loss: #d9480f;
+  --chart-grid: #e8ecf0;
+  --chart-axis: #c8d0d8;
+  --chart-ink: #5b6673;
+  --chart-cursor: rgba(14, 22, 33, 0.06);
+
+  --sidebar: #ffffff;
+  --sidebar-border: #e1e6eb;
+}
+
+.dark {
+  --background: #0a0e13;
+  --foreground: #e6edf3;
+  --card: #10161d;
+  --card-foreground: #e6edf3;
+  --popover: #121a22;
+  --popover-foreground: #e6edf3;
+  --primary: #3cc4b7;
+  --primary-foreground: #06201d;
+  --secondary: #18212b;
+  --secondary-foreground: #e6edf3;
+  --muted: #151d26;
+  --muted-foreground: #8b98a5;
+  --accent: #1a2430;
+  --accent-foreground: #e6edf3;
+  --destructive: #f0835c;
+  --destructive-foreground: #1c0a03;
+  --border: #1f2a35;
+  --input: #263241;
+  --ring: #3cc4b7;
+
+  --gain: #3cc4b7;
+  --loss: #f0835c;
+  --warning: #e0a63a;
+  --info: #6aa8f0;
+
+  --chart-value: #3987e5;
+  --chart-gain: #1d9c92;
+  --chart-loss: #e0602f;
+  --chart-grid: #1a232d;
+  --chart-axis: #2a3644;
+  --chart-ink: #8b98a5;
+  --chart-cursor: rgba(230, 237, 243, 0.06);
+
+  --sidebar: #0d1218;
+  --sidebar-border: #1a232d;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-gain: var(--gain);
+  --color-loss: var(--loss);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-chart-value: var(--chart-value);
+  --color-chart-gain: var(--chart-gain);
+  --color-chart-loss: var(--chart-loss);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+  /* Respect users who prefer less motion. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Tabular figures for numbers that align in columns (tables, axes). */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
