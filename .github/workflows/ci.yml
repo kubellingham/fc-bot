@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Typecheck, lint, unit tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
+
+  integration:
+    name: Integration + end-to-end (local Supabase)
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Start local Supabase stack
+        run: pnpm db:start
+      - name: RLS and integrity tests
+        run: pnpm test:integration
+      - name: Configure and build the app against the local stack
+        run: |
+          pnpm --silent db:env | grep NEXT_PUBLIC > .env.local
+          echo "NEXT_PUBLIC_SITE_URL=http://localhost:3000" >> .env.local
+          pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: End-to-end tests (production build)
+        run: |
+          pnpm start > next.log 2>&1 &
+          npx --yes wait-on@8 -t 60000 http://localhost:3000
+          E2E_BASE_URL=http://localhost:3000 pnpm test:e2e
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-artifacts
+          path: |
+            test-results/
+            next.log
+          retention-days: 7
+      - if: always()
+        run: pnpm db:stop

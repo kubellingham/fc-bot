@@ -67,7 +67,10 @@ const PLAYERS = [
 ];
 
 const players = must(
-  await supabase.from("players").insert(PLAYERS.map(({ base, drift, ...p }) => p)).select("id, name"),
+  await supabase
+    .from("players")
+    .insert(PLAYERS.map((p) => ({ name: p.name, version: p.version, rating: p.rating, position: p.position, club: p.club, league: p.league, nation: p.nation, rarity: p.rarity })))
+    .select("id, name"),
   "players",
 );
 const idOf = (name) => players.find((p) => p.name === name).id;

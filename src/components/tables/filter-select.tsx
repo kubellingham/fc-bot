@@ -17,10 +17,12 @@ export function FilterSelect({
   options: { value: string; label: string }[];
   allLabel: string;
 }) {
+  // Explicit label so the trigger is correct on first render (Radix otherwise fills it in after mount).
+  const current = value === ALL ? allLabel : (options.find((o) => o.value === value)?.label ?? allLabel);
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger size="sm" className="w-full sm:w-40" aria-label={label}>
-        <SelectValue />
+        <SelectValue>{current}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectItem value={ALL}>{allLabel}</SelectItem>
