@@ -37,3 +37,6 @@ npm-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local exploration scripts
+/.scratch/

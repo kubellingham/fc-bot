@@ -134,3 +134,43 @@ export function daysBetween(from: string | Date, to: string | Date): number {
   const b = typeof to === "string" ? Date.parse(to) : to.getTime();
   return (b - a) / 86_400_000;
 }
+
+/** Offset (ms) of `timeZone` from UTC at the given instant. */
+function zoneOffsetMs(instant: number, timeZone: string): number {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hourCycle: "h23",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  }).formatToParts(new Date(instant));
+  const get = (t: string) => Number(parts.find((p) => p.type === t)?.value);
+  const asUtc = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
+  return asUtc - Math.floor(instant / 1000) * 1000;
+}
+
+/**
+ * Converts a wall-clock time in `timeZone` to a UTC instant. For times skipped
+ * by a DST change the result moves forward by the gap; for repeated times the
+ * earlier instant is used.
+ */
+export function zonedTimeToUtc(
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  minute: number,
+  timeZone: string,
+): Date {
+  const wall = Date.UTC(year, month - 1, day, hour, minute);
+  const HALF_DAY = 12 * 3_600_000;
+  // Candidate instants using the offsets in force well before and well after any nearby transition.
+  const before = wall - zoneOffsetMs(wall - HALF_DAY, timeZone);
+  const after = wall - zoneOffsetMs(wall + HALF_DAY, timeZone);
+  const valid = [before, after].filter((c) => c + zoneOffsetMs(c, timeZone) === wall);
+  // Repeated time → earliest valid instant. Skipped time (no valid candidate) → shift forward by the gap.
+  return new Date(valid.length > 0 ? Math.min(...valid) : before);
+}

@@ -192,3 +192,22 @@ describe("date keys", () => {
     expect(enumeratePeriods("2026-09-05T00:00:00Z", "2026-09-01T00:00:00Z", "day", "UTC")).toEqual([]);
   });
 });
+
+describe("zonedTimeToUtc", () => {
+  it("converts wall-clock times in a zone to UTC", async () => {
+    const { zonedTimeToUtc } = await import("./dates");
+    expect(zonedTimeToUtc(2026, 9, 1, 14, 30, "Europe/London").toISOString()).toBe("2026-09-01T13:30:00.000Z");
+    expect(zonedTimeToUtc(2026, 1, 15, 9, 0, "America/New_York").toISOString()).toBe("2026-01-15T14:00:00.000Z");
+    expect(zonedTimeToUtc(2026, 6, 1, 0, 0, "UTC").toISOString()).toBe("2026-06-01T00:00:00.000Z");
+    expect(zonedTimeToUtc(2026, 9, 1, 8, 0, "Asia/Kolkata").toISOString()).toBe("2026-09-01T02:30:00.000Z");
+  });
+
+  it("handles DST transitions without throwing", async () => {
+    const { zonedTimeToUtc } = await import("./dates");
+    // 2026-03-29 01:30 does not exist in London (clocks jump 01:00 → 02:00).
+    expect(zonedTimeToUtc(2026, 3, 29, 1, 30, "Europe/London").toISOString()).toBe("2026-03-29T01:30:00.000Z");
+    // 2026-10-25 01:30 happens twice in London; the earlier (BST) instant is used.
+    expect(zonedTimeToUtc(2026, 10, 25, 1, 30, "Europe/London").toISOString()).toBe("2026-10-25T00:30:00.000Z");
+    expect(zonedTimeToUtc(2026, 3, 29, 3, 0, "Europe/London").toISOString()).toBe("2026-03-29T02:00:00.000Z");
+  });
+});

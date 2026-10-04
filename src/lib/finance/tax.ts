@@ -112,3 +112,24 @@ export function profitAtPrice(unitCost: number, targetPrice: number, taxRate: nu
   }
   return calculateSale({ unitPrice: targetPrice, unitCost, quantity: 1, taxRate });
 }
+
+/**
+ * Result of selling an entire position (possibly bought at several prices) at
+ * one price. Uses the exact total cost, so a fractional average cost is never rounded.
+ */
+export function positionProfitAtPrice(totalCost: number, quantity: number, targetPrice: number, taxRate: number): SaleResult {
+  assertWholeCoins(totalCost, "Total cost");
+  assertWholeCoins(targetPrice, "Target price", { min: 1 });
+  assertQuantity(quantity);
+  const proceeds = saleProceedsUnits(targetPrice, quantity, taxRate);
+  const costUnits = totalCost * BPS_SCALE;
+  const profitUnits = proceeds.net - costUnits;
+  return {
+    grossProceeds: unitsToCoins(proceeds.gross),
+    tax: unitsToCoins(proceeds.tax),
+    netProceeds: unitsToCoins(proceeds.net),
+    acquisitionCost: totalCost,
+    netProfit: unitsToCoins(profitUnits),
+    roiPercent: percentOf(profitUnits, costUnits),
+  };
+}

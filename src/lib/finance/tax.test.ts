@@ -5,6 +5,7 @@ import {
   breakEvenSalePriceForPosition,
   calculateSale,
   calculateSaleProceeds,
+  positionProfitAtPrice,
   profitAtPrice,
 } from "./tax";
 
@@ -122,9 +123,16 @@ describe("break-even sale price", () => {
   });
 });
 
-describe("profitAtPrice", () => {
+describe("profitAtPrice / positionProfitAtPrice", () => {
   it("projects the per-card profit at a target sale price", () => {
     expect(profitAtPrice(10_000, 11_000, TAX).netProfit).toBe(450);
+  });
+
+  it("uses the exact total cost of a mixed-price position", () => {
+    // 3 copies costing 30,001 in total, all sold at 11,000: 33,000 × 0.95 − 30,001
+    const r = positionProfitAtPrice(30_001, 3, 11_000, TAX);
+    expect(r.netProceeds).toBe(31_350);
+    expect(r.netProfit).toBe(1_349);
   });
 });
 
