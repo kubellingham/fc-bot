@@ -20,9 +20,10 @@ export function localInputToIso(local: string): string {
   return Number.isNaN(d.getTime()) ? "" : d.toISOString();
 }
 
+/** Current time, kept to the second so entries made in quick succession stay in order. */
 export function nowIso(): string {
   const d = new Date();
-  d.setSeconds(0, 0);
+  d.setMilliseconds(0);
   return d.toISOString();
 }
 

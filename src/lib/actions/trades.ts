@@ -108,7 +108,7 @@ export async function recordSale(raw: unknown) {
       const soldAt = Date.parse(input.soldAt);
       const candidates = lots
         .filter((l) => Date.parse(l.lot.acquiredAt) <= soldAt)
-        .map((l) => ({ id: l.lot.id, remainingQuantity: l.remainingQuantity, acquiredAt: l.lot.acquiredAt }));
+        .map((l) => ({ id: l.lot.id, remainingQuantity: l.remainingQuantity, acquiredAt: l.lot.acquiredAt, createdAt: l.lot.createdAt }));
       try {
         allocations = allocateFifo(candidates, input.quantity);
       } catch (e) {

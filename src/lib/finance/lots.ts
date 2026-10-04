@@ -111,6 +111,8 @@ export interface FifoCandidate {
   id: string;
   remainingQuantity: number;
   acquiredAt: string;
+  /** Recording time; the tie-breaker when purchase times are equal. */
+  createdAt?: string;
 }
 
 export interface FifoAllocation {
@@ -127,13 +129,19 @@ export class InsufficientQuantityError extends FinanceInputError {
 
 /**
  * Allocates a sale across open lots, oldest purchase first (FIFO).
- * Ties on purchase time are broken by id so the result is deterministic.
+ * Ties on purchase time are broken by when the purchase was recorded, then by
+ * id, so the result is deterministic.
  */
 export function allocateFifo(candidates: readonly FifoCandidate[], quantity: number): FifoAllocation[] {
   assertQuantity(quantity);
   const open = candidates
     .filter((c) => c.remainingQuantity > 0)
-    .sort((a, b) => Date.parse(a.acquiredAt) - Date.parse(b.acquiredAt) || a.id.localeCompare(b.id));
+    .sort(
+      (a, b) =>
+        Date.parse(a.acquiredAt) - Date.parse(b.acquiredAt) ||
+        (a.createdAt && b.createdAt ? Date.parse(a.createdAt) - Date.parse(b.createdAt) : 0) ||
+        a.id.localeCompare(b.id),
+    );
 
   const available = open.reduce((sum, c) => sum + c.remainingQuantity, 0);
   if (available < quantity) throw new InsufficientQuantityError(available, quantity);

@@ -31,6 +31,17 @@ describe("latestPricesByPlayer", () => {
   });
 });
 
+describe("observation ordering", () => {
+  it("breaks same-time ties by recording time, so the last entry is the latest", () => {
+    const first = { id: "zzz", playerId: "T", price: 10_000, observedAt: "2026-09-01T10:00:00Z", createdAt: "2026-09-01T10:00:01Z" };
+    const second = { id: "aaa", playerId: "T", price: 8_500, observedAt: "2026-09-01T10:00:00Z", createdAt: "2026-09-01T10:00:09Z" };
+    expect(latestPricesByPlayer([second, first]).get("T")?.price).toBe(8_500);
+    expect(
+      evaluateAlert({ type: "price_below", targetValue: 9_000, lookbackHours: null, direction: "any" }, [second, first]).status,
+    ).toBe("satisfied");
+  });
+});
+
 describe("price changes", () => {
   const history = [
     obs(10_000, "2026-09-01T00:00:00Z"),

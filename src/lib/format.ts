@@ -32,7 +32,7 @@ export function createFormatter(prefs: FormatPrefs = DEFAULT_FORMAT_PREFS): Form
   const locale = safeLocale(prefs.locale);
   const timeZone = prefs.timeZone || "UTC";
   const whole = new Intl.NumberFormat(locale, { maximumFractionDigits: 0 });
-  const compactFmt = new Intl.NumberFormat(locale, { notation: "compact", maximumFractionDigits: 1 });
+  const compactFmt = new Intl.NumberFormat(locale, { notation: "compact", maximumSignificantDigits: 3 });
   const dateFmt = new Intl.DateTimeFormat(locale, { timeZone, year: "numeric", month: "short", day: "numeric" });
   const dateTimeFmt = new Intl.DateTimeFormat(locale, {
     timeZone,

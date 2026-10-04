@@ -189,12 +189,17 @@ export function WatchlistTable({ rows, players }: { rows: WatchRow[]; players: P
                   <Sparkline values={r.spark} />
                 </TableCell>
                 <TableCell className="text-right text-xs">
-                  <div>
-                    Buy ≤ <Coins value={r.item.targetBuyPrice} />
-                  </div>
-                  <div className="text-muted-foreground">
-                    Sell ≥ <Coins value={r.item.targetSellPrice} />
-                  </div>
+                  {r.item.targetBuyPrice !== null && (
+                    <div>
+                      Buy ≤ <Coins value={r.item.targetBuyPrice} />
+                    </div>
+                  )}
+                  {r.item.targetSellPrice !== null && (
+                    <div className="text-muted-foreground">
+                      Sell ≥ <Coins value={r.item.targetSellPrice} />
+                    </div>
+                  )}
+                  {r.item.targetBuyPrice === null && r.item.targetSellPrice === null && <span className="text-muted-foreground">No targets</span>}
                 </TableCell>
                 <TableCell>
                   <div className="flex justify-end gap-0.5">

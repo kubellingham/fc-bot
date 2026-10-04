@@ -19,7 +19,8 @@ describe("createFormatter", () => {
   });
 
   it("supports compact notation and other locales", () => {
-    expect(f.coins(1_250_000, { compact: true })).toBe("1.3M");
+    expect(f.coins(1_250_000, { compact: true })).toBe("1.25M");
+    expect(f.coins(2_450_000, { compact: true })).not.toBe(f.coins(2_550_000, { compact: true }));
     expect(f.coins(9_999, { compact: true })).toBe("9,999");
     const de = createFormatter({ locale: "de-DE", compact: false, timeZone: "UTC" });
     expect(de.coins(1234567)).toBe("1.234.567");

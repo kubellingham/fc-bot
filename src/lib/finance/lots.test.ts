@@ -134,6 +134,14 @@ describe("allocateFifo", () => {
     expect(allocateFifo(tie, 1)).toEqual([{ lotId: "a", quantity: 1 }]);
   });
 
+  it("breaks purchase-time ties by recording time before id", () => {
+    const tie = [
+      { id: "a", remainingQuantity: 1, acquiredAt: "2026-09-01T00:00:00.000Z", createdAt: "2026-09-01T00:00:05.000Z" },
+      { id: "b", remainingQuantity: 1, acquiredAt: "2026-09-01T00:00:00.000Z", createdAt: "2026-09-01T00:00:01.000Z" },
+    ];
+    expect(allocateFifo(tie, 1)).toEqual([{ lotId: "b", quantity: 1 }]);
+  });
+
   it("rejects a non-positive quantity", () => {
     expect(() => allocateFifo(candidates, 0)).toThrow(/positive whole number/);
   });

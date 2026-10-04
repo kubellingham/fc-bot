@@ -3,23 +3,28 @@ import type { LatestPrice, PriceObservation } from "./types";
 
 const HOUR_MS = 3_600_000;
 
-/** Returns a new array sorted oldest → newest (ties broken by id for determinism). */
-export function sortObservations<T extends Pick<PriceObservation, "observedAt" | "id">>(observations: readonly T[]): T[] {
-  return [...observations].sort(
-    (a, b) => Date.parse(a.observedAt) - Date.parse(b.observedAt) || a.id.localeCompare(b.id),
+type Orderable = Pick<PriceObservation, "observedAt" | "id" | "createdAt">;
+
+/** Chronological order: observation time, then recording time, then id (fully deterministic). */
+export function compareObservations(a: Orderable, b: Orderable): number {
+  return (
+    Date.parse(a.observedAt) - Date.parse(b.observedAt) ||
+    (a.createdAt && b.createdAt ? Date.parse(a.createdAt) - Date.parse(b.createdAt) : 0) ||
+    a.id.localeCompare(b.id)
   );
+}
+
+/** Returns a new array sorted oldest → newest. */
+export function sortObservations<T extends Orderable>(observations: readonly T[]): T[] {
+  return [...observations].sort(compareObservations);
 }
 
 /** Latest observation per player. Input order does not matter. */
 export function latestPricesByPlayer(observations: readonly PriceObservation[]): Map<string, LatestPrice> {
-  const latest = new Map<string, LatestPrice & { id: string }>();
+  const latest = new Map<string, PriceObservation>();
   for (const obs of observations) {
     const current = latest.get(obs.playerId);
-    const newer =
-      !current ||
-      Date.parse(obs.observedAt) > Date.parse(current.observedAt) ||
-      (Date.parse(obs.observedAt) === Date.parse(current.observedAt) && obs.id > current.id);
-    if (newer) latest.set(obs.playerId, { price: obs.price, observedAt: obs.observedAt, id: obs.id });
+    if (!current || compareObservations(obs, current) > 0) latest.set(obs.playerId, obs);
   }
   return new Map([...latest].map(([playerId, { price, observedAt }]) => [playerId, { price, observedAt }]));
 }

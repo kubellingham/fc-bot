@@ -14,7 +14,8 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.test.{ts,tsx}", "test/**/*.test.{ts,tsx}"],
-    exclude: ["e2e/**", "node_modules/**", "supabase/**"],
+    // Integration tests need the local Supabase stack: run them with `pnpm test:integration`.
+    exclude: ["e2e/**", "node_modules/**", "supabase/**", "test/integration/**"],
     setupFiles: ["test/setup.ts"],
     restoreMocks: true,
   },

@@ -33,7 +33,7 @@ function compose(args, secrets, opts = {}) {
 }
 
 function psql(secrets, sql, { file } = {}) {
-  const args = ["compose", "-f", composeFile, "exec", "-T", "db", "psql", "-v", "ON_ERROR_STOP=1", "-U", "postgres", "-d", "postgres", "-q"];
+  const args = ["compose", "-f", composeFile, "exec", "-T", "-e", "PGOPTIONS=-c client_min_messages=warning", "db", "psql", "-v", "ON_ERROR_STOP=1", "-U", "postgres", "-d", "postgres", "-q"];
   if (!file) args.push("-c", sql);
   return execFileSync("docker", args, {
     input: file ? readFileSync(file) : undefined,

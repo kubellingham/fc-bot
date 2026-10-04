@@ -10,6 +10,8 @@ export interface LotRecord {
   quantity: number;
   unitCost: number;
   acquiredAt: string;
+  /** When the purchase was recorded. Breaks FIFO ties between purchases made at the same time. */
+  createdAt?: string;
 }
 
 /** A sale of some copies from a specific lot. `taxRate` is the rate in force when the sale was recorded. */
@@ -28,6 +30,8 @@ export interface PriceObservation {
   playerId: string;
   price: number;
   observedAt: string;
+  /** When the observation was recorded. Breaks ties between observations with the same time. */
+  createdAt?: string;
 }
 
 /** Coins gained or spent outside of trading (rewards, packs, reconciliation). */

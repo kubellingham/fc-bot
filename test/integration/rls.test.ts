@@ -31,8 +31,9 @@ beforeAll(async () => {
   [alice, bob] = await Promise.all([createTestUser("alice"), createTestUser("bob")]);
 
   const c = alice.client;
+  // Throws on any error; returns the data (null for inserts without .select()).
   const must = <T>(r: { data: T; error: unknown }): NonNullable<T> => {
-    if (r.error || r.data === null || r.data === undefined) throw r.error ?? new Error("no data");
+    if (r.error) throw r.error;
     return r.data as NonNullable<T>;
   };
   must(await c.from("profiles").insert({ display_name: "Alice" }));

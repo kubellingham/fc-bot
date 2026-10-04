@@ -42,7 +42,13 @@ export function holdingRows(p: PortfolioData): HoldingRow[] {
       const player = p.players.get(h.playerId) ?? UNKNOWN_PLAYER;
       const openLots = p.lots
         .filter((l) => l.lot.playerId === h.playerId && l.remainingQuantity > 0)
-        .map((l) => ({ id: l.lot.id, remainingQuantity: l.remainingQuantity, unitCost: l.lot.unitCost, acquiredAt: l.lot.acquiredAt }));
+        .map((l) => ({
+          id: l.lot.id,
+          remainingQuantity: l.remainingQuantity,
+          unitCost: l.lot.unitCost,
+          acquiredAt: l.lot.acquiredAt,
+          createdAt: l.lot.createdAt,
+        }));
       return {
         playerId: h.playerId,
         label: playerLabel(player),

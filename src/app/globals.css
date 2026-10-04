@@ -141,6 +141,12 @@
   html.dark {
     color-scheme: dark;
   }
+  /* Grid items default to min-width:auto, so a wide table would stretch its track and
+     overflow the page. Let them shrink (wide content scrolls in its own container).
+     :where() keeps specificity at zero so explicit utilities still win. */
+  :where(.grid) > * {
+    min-width: 0;
+  }
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "cv11", "ss01";

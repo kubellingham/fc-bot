@@ -101,7 +101,7 @@ export async function getObservations(opts: { playerIds?: string[]; since?: Date
     let q = supabase.from("price_observations").select("*");
     if (opts.playerIds) q = q.in("player_id", opts.playerIds);
     if (opts.since) q = q.gte("observed_at", opts.since.toISOString());
-    return q.order("observed_at", { ascending: true }).order("id").range(from, to);
+    return q.order("observed_at", { ascending: true }).order("created_at", { ascending: true }).order("id").range(from, to);
   });
   return rows.map(toObservation);
 }

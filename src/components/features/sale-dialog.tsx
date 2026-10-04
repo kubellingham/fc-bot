@@ -21,6 +21,7 @@ export interface OpenLot {
   remainingQuantity: number;
   unitCost: number;
   acquiredAt: string;
+  createdAt?: string;
 }
 
 /**

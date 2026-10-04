@@ -49,6 +49,7 @@ export const toObservation = (r: Row<"price_observations">): Observation => ({
   observedAt: r.observed_at,
   source: r.source === "import" ? "import" : "manual",
   notes: r.notes,
+  createdAt: r.created_at,
 });
 
 export const toWatchlistItem = (r: Row<"watchlist_items">): WatchlistItem => ({

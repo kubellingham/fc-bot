@@ -29,6 +29,7 @@ export async function evaluateAlertsForPlayer(
       .select("*")
       .eq("player_id", playerId)
       .order("observed_at", { ascending: false })
+      .order("created_at", { ascending: false })
       .order("id", { ascending: false })
       .limit(400),
     supabase.from("players").select("*").eq("id", playerId).single(),
